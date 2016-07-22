@@ -12,6 +12,7 @@ import CoreData
 class DataStore {
     
     var messages:[Message] = []
+    var recepients: [Recepient] = []
     
     static let sharedDataStore = DataStore()
     
@@ -37,20 +38,26 @@ class DataStore {
         
         var error:NSError? = nil
         
-        let messagesRequest = NSFetchRequest(entityName: "Message")
+        let messagesRequest = NSFetchRequest(entityName: Message.entityName)
+        let recepientRequest = NSFetchRequest(entityName: Recepient.entityName)
         
         let createdAtSorter = NSSortDescriptor(key: "createdAt", ascending:true)
+        let recepientNameSorter = NSSortDescriptor(key: "name", ascending: true)
         
         messagesRequest.sortDescriptors = [createdAtSorter]
+        recepientRequest.sortDescriptors = [recepientNameSorter]
         
         do{
             messages = try managedObjectContext.executeFetchRequest(messagesRequest) as! [Message]
+            recepients = try managedObjectContext.executeFetchRequest(recepientRequest) as! [Recepient]
         }catch let nserror1 as NSError{
             error = nserror1
+            print(error)
             messages = []
+            recepients = []
         }
         
-        if messages.count == 0 {
+        if recepients.count == 0 {
             generateTestData()
         }
         
@@ -59,20 +66,57 @@ class DataStore {
     
     func generateTestData() {
         
-        let messageOne: Message = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: managedObjectContext) as! Message
+        let messageOne: Message = NSEntityDescription.insertNewObjectForEntityForName(Message.entityName, inManagedObjectContext: managedObjectContext) as! Message
         
-        messageOne.content = "Message 1"
+        messageOne.content = "You are cute"
         messageOne.createdAt = NSDate()
         
-        let messageTwo: Message = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: managedObjectContext) as! Message
+        let messageTwo: Message = NSEntityDescription.insertNewObjectForEntityForName(Message.entityName, inManagedObjectContext: managedObjectContext) as! Message
         
-        messageTwo.content = "Message 2"
+        messageTwo.content = "You are awesome"
         messageTwo.createdAt = NSDate()
         
-        let messageThree: Message = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: managedObjectContext) as! Message
+        let messageThree: Message = NSEntityDescription.insertNewObjectForEntityForName(Message.entityName, inManagedObjectContext: managedObjectContext) as! Message
         
-        messageThree.content = "Message 3"
+        messageThree.content = "I miss you"
         messageThree.createdAt = NSDate()
+        
+        
+        let messageFour: Message = NSEntityDescription.insertNewObjectForEntityForName(Message.entityName, inManagedObjectContext: managedObjectContext) as! Message
+        
+        messageFour.content = "I love you"
+        messageFour.createdAt = NSDate()
+        
+        let messageFive: Message = NSEntityDescription.insertNewObjectForEntityForName(Message.entityName, inManagedObjectContext: managedObjectContext) as! Message
+        
+        messageFive.content = "I miss you"
+        messageFive.createdAt = NSDate()
+        
+        let messageSix: Message = NSEntityDescription.insertNewObjectForEntityForName(Message.entityName, inManagedObjectContext: managedObjectContext) as! Message
+        
+        messageSix.content = "You are my sweetie pie"
+        messageSix.createdAt = NSDate()
+        
+        
+        let recepientOne: Recepient = NSEntityDescription.insertNewObjectForEntityForName(Recepient.entityName, inManagedObjectContext: managedObjectContext) as! Recepient
+        recepientOne.name = "Cenker"
+        recepientOne.email = "email1@email1.com"
+        recepientOne.phoneNumber = "111-11-11"
+        recepientOne.twitterHandle = "@firstRecepient"
+        //inserting messages
+        recepientOne.message?.insert(messageOne)
+        recepientOne.message?.insert(messageTwo)
+        recepientOne.message?.insert(messageThree)
+        
+        
+        let recepientTwo: Recepient = NSEntityDescription.insertNewObjectForEntityForName(Recepient.entityName, inManagedObjectContext: managedObjectContext) as! Recepient
+        recepientTwo.name = "Helen"
+        recepientTwo.email = "email2@email2.com"
+        recepientTwo.phoneNumber = "222-22-22"
+        recepientTwo.twitterHandle = "@secondRecepient"
+        recepientTwo.message?.insert(messageFour)
+        recepientTwo.message?.insert(messageFive)
+        recepientTwo.message?.insert(messageSix)
         
         saveContext()
         fetchData()
